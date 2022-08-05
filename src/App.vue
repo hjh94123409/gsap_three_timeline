@@ -5,11 +5,9 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import * as THREE from "three";
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import gsap from "gsap";
-import { pow3 } from "../../../libs/jsm/nodes/Nodes";
-
-
+import { GUI } from "dat.gui";
 
 const canvasBox = ref(null);
 
@@ -32,7 +30,13 @@ const data = {
     },
 };
 
-let scene, camera, renderer, cube;
+let scene,
+    camera,
+    renderer,
+    cube,
+    ambientlight,
+    hemisphereLight,
+    directionalLight;
 
 const addScene = () => {
     scene = new THREE.Scene();
@@ -83,9 +87,9 @@ const onWindowResize = () => {
 };
 
 const addLights = () => {
-    const ambientlight = new THREE.AmbientLight(0xffffff, 0.9);
-    const hemisphereLight = new THREE.HemisphereLight(0xffffff, 0xffffff, 0.1);
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.1);
+    ambientlight = new THREE.AmbientLight(0xffffff, 0.9);
+    hemisphereLight = new THREE.HemisphereLight(0xffffff, 0xffffff, 0.1);
+    directionalLight = new THREE.DirectionalLight(0xffffff, 0.1);
     directionalLight.position.set(10, 100, 30);
     directionalLight.castShadow = true;
     scene.add(ambientlight);
@@ -151,8 +155,8 @@ const addPlateform = () => {
 
 class Cube {
     constructor() {
-      this.mesh;
-      this.cube;
+        this.mesh;
+        this.cube;
         this.createCube();
     }
     createCube() {
@@ -178,112 +182,157 @@ const addControls = () => {
     new OrbitControls(camera, renderer.domElement);
 };
 
-const getDegree = degree => degree * Math.PI / 180
+const getDegree = (degree) => (degree * Math.PI) / 180;
 
 const timeline = () => {
-  
-  const t1 = gsap.timeline({
-    repeat: -1,
-    repeatDelay: data.delay
-  })
-  // console.log(cube.cube)
-  t1.set(cube.cube.material, {
-    opacity: 0
-  })
+    const t1 = gsap.timeline({
+        repeat: -1,
+        repeatDelay: data.delay,
+    });
+    // console.log(cube.cube)
+    t1.set(cube.cube.material, {
+        opacity: 0,
+    });
 
-  t1.to(cube.cube.position, {
-    duration: 0.8,
-    y: -0.4,
-    ease: 'Bounce.easeOut'
-  })
+    t1.to(cube.cube.position, {
+        duration: 0.8,
+        y: -0.4,
+        ease: "Bounce.easeOut",
+    });
 
-  t1.to(cube.cube.scale, {
-    duration: 0.8,
-    y: 1,
-    ease: 'Bounce.easeOut'
-  }, '-=0.8')
+    t1.to(
+        cube.cube.scale,
+        {
+            duration: 0.8,
+            y: 1,
+            ease: "Bounce.easeOut",
+        },
+        "-=0.8"
+    );
 
-  t1.to(cube.cube.material, {
-    duration: 0.5,
-    opacity: 1
-  }, '<') //插入到上一个动画的开始位置
+    t1.to(
+        cube.cube.material,
+        {
+            duration: 0.5,
+            opacity: 1,
+        },
+        "<"
+    ); //插入到上一个动画的开始位置
 
-  t1.to(cube.cube.rotation, {
-    duration: 0.8,
-    x: getDegree(-90)
-  }, '+=0.2') 
+    t1.to(
+        cube.cube.rotation,
+        {
+            duration: 0.8,
+            x: getDegree(-90),
+        },
+        "+=0.2"
+    );
 
-  t1.to(cube.cube.position, {
-    duration: 0.3,
-    y: -0.2
-  }, '<')
+    t1.to(
+        cube.cube.position,
+        {
+            duration: 0.3,
+            y: -0.2,
+        },
+        "<"
+    );
 
-  t1.to(cube.cube.position, {
-    duration: 0.8,
-    z: -0.5
-  }, '<')
+    t1.to(
+        cube.cube.position,
+        {
+            duration: 0.8,
+            z: -0.5,
+        },
+        "<"
+    );
 
-  t1.to(cube.cube.position, {
-    duration: 0.3,
-    y: -0.4
-  }, '-=0.4') 
+    t1.to(
+        cube.cube.position,
+        {
+            duration: 0.3,
+            y: -0.4,
+        },
+        "-=0.4"
+    );
 
-  t1.to(cube.cube.rotation, {
-    duration: 0.8,
-    y: getDegree(-90)
-  }) 
+    t1.to(cube.cube.rotation, {
+        duration: 0.8,
+        y: getDegree(-90),
+    });
 
-  t1.to(cube.cube.position, {
-    duration: 0.3,
-    y: -0.2
-  }, '<')
-  
+    t1.to(
+        cube.cube.position,
+        {
+            duration: 0.3,
+            y: -0.2,
+        },
+        "<"
+    );
 
-  t1.to(cube.cube.position, {
-    duration: 0.8,
-    x: -1
-  }, '<')
+    t1.to(
+        cube.cube.position,
+        {
+            duration: 0.8,
+            x: -1,
+        },
+        "<"
+    );
 
-  t1.to(cube.cube.position, {
-    duration: 0.3,
-    y: -0.4
-  }, '-=0.4')
+    t1.to(
+        cube.cube.position,
+        {
+            duration: 0.3,
+            y: -0.4,
+        },
+        "-=0.4"
+    );
 
-  t1.to(cube.cube.rotation, {
-    duration: 0.8,
-    x: 0,
-    ease: 'Power3.easeOut'
-  })
+    t1.to(cube.cube.rotation, {
+        duration: 0.8,
+        x: 0,
+        ease: "Power3.easeOut",
+    });
 
-  t1.to(cube.cube.position, {
-    duration: 0.8,
-    z: 0.8,
-    ease: 'Power3.easeOut'
-  }, '<')
+    t1.to(
+        cube.cube.position,
+        {
+            duration: 0.8,
+            z: 0.8,
+            ease: "Power3.easeOut",
+        },
+        "<"
+    );
 
-  t1.to(cube.cube.position, {
-    duration: 0.6,
-    y: -4,
-    ease: 'Power3.easeIn'
-  }, '<')
+    t1.to(
+        cube.cube.position,
+        {
+            duration: 0.6,
+            y: -4,
+            ease: "Power3.easeIn",
+        },
+        "<"
+    );
 
-  t1.to(cube.cube.scale, {
-    duration: 0.8,
-    y: 1.5
-  }, '-=0.5')
+    t1.to(
+        cube.cube.scale,
+        {
+            duration: 0.8,
+            y: 1.5,
+        },
+        "-=0.5"
+    );
 
-  t1.to(cube.cube.material, {
-    duration: 0.25,
-    opacity: 0
-  }, '-=0.85')
+    t1.to(
+        cube.cube.material,
+        {
+            duration: 0.25,
+            opacity: 0,
+        },
+        "-=0.85"
+    );
 
-
-  t1.timeScale(data.duration)
-
-
-
-
-}
+    t1.timeScale(data.duration);
+};
 
 const init = () => {
     addScene();
@@ -295,13 +344,92 @@ const init = () => {
     addGround();
     addPlateform();
     addCube();
-    addControls()
-    timeline()
+    addControls();
+    timeline();
     window.addEventListener("resize", onWindowResize);
 };
 
+
+
+const guiFn = () => {
+
+  const ctrlObj = {
+    ambientlightVisible: true,
+    ambientlightColor: 0xffffff,
+    ambientlightIntensity: 0.9,
+
+    hemisphereLightVisible: true,
+    hemisphereLightGroundColor: 0xffffff,
+    hemisphereLightSkyColor: 0xffffff,
+    hemisphereIntensity: 0.1,
+
+    directionalLightColor: 0xffffff,
+    directionalLightIntensity: 0.1,
+    directionalLightVisible: true,
+
+    cubeColor: 0xffffff,
+};
+
+    const ctrl = new GUI();
+    const ambientlightFolder = ctrl.addFolder("ambientlight");
+    ambientlightFolder.add(ctrlObj, "ambientlightVisible").onChange((e) => {
+        ambientlight.visible = e;
+    });
+    ambientlightFolder.addColor(ctrlObj, "ambientlightColor").onChange((e) => {
+        ambientlight.color = new THREE.Color(e);
+    });
+    ambientlightFolder
+        .add(ctrlObj, "ambientlightIntensity", 0, 1)
+        .onChange((e) => {
+            ambientlight.intensity = e;
+        });
+
+    const directionalLightFolder = ctrl.addFolder("directionalLight");
+    directionalLightFolder
+        .add(ctrlObj, "directionalLightVisible")
+        .onChange((e) => {
+            directionalLight.visible = e;
+        });
+    directionalLightFolder
+        .addColor(ctrlObj, "directionalLightColor")
+        .onChange((e) => {
+            directionalLight.color = new THREE.Color(e);
+        });
+    directionalLightFolder
+        .add(ctrlObj, "directionalLightIntensity", 0, 0.1)
+        .onChange((e) => {
+            directionalLight.intensity = e;
+        });
+
+    const hemisphereLightFolder = ctrl.addFolder("hemisphereLight");
+    hemisphereLightFolder
+        .add(ctrlObj, "hemisphereLightVisible")
+        .onChange((e) => {
+            hemisphereLight.visible = e;
+        });
+    hemisphereLightFolder
+        .addColor(ctrlObj, "hemisphereLightGroundColor")
+        .onChange((e) => {
+            hemisphereLight.groundColor = new THREE.Color(e);
+        });
+    hemisphereLightFolder
+        .addColor(ctrlObj, "hemisphereLightSkyColor")
+        .onChange((e) => {
+            hemisphereLight.color = new THREE.Color(e);
+        });
+    hemisphereLightFolder.add(ctrlObj, "cubeColor").onChange((e) => {
+        hemisphereLight.intensity = e;
+    });
+    const cubeFolder = ctrl.addFolder("cube");
+    cubeFolder.addColor(ctrlObj, "hemisphereLightGroundColor").onChange((e) => {
+        cube.cube.material.color = new THREE.Color(e);
+    });
+    
+};
+
 onMounted(() => {
-    init();
+  init();
+  guiFn()
 });
 </script>
 
